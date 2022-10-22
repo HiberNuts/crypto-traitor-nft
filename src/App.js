@@ -6,6 +6,8 @@ import abi from "./utils/abi.json";
 import { Box, Button, CircularProgress, Modal, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import "./App.css";
+
+import CancelIcon from "@mui/icons-material/Cancel";
 const style = {
   position: "absolute",
   top: "50%",
@@ -31,12 +33,14 @@ function App() {
   const [noOfMint, setnoOfMint] = useState(0);
   const [network, setnetwork] = useState(false);
   const [chain, setchain] = useState("");
+  const [error, seterror] = useState(false);
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => false;
+  const handleClose = () => seterror(false);
 
   const checkIfWalletIsConnected = async () => {
+    seterror(false);
     const { ethereum } = window;
 
     if (!ethereum) {
@@ -64,11 +68,12 @@ function App() {
     const goerliChainId = "0x5";
     if (chainId !== goerliChainId) {
       setnetwork(true);
+      seterror(false);
     } else {
       setnetwork(false);
+      seterror(false);
     }
   };
-  console.log("current", CurrentAccount);
 
   const connectWallet = async () => {
     try {
@@ -90,6 +95,7 @@ function App() {
   const askContractToMintNft = async () => {
     try {
       setloading(true);
+      seterror(false);
       const { ethereum } = window;
 
       if (ethereum) {
@@ -104,6 +110,7 @@ function App() {
         await nftTxn.wait();
         setloading(false);
         setsuccess(true);
+        seterror(false);
         setInterval(() => {
           setsuccess(false);
         }, 6000);
@@ -113,6 +120,13 @@ function App() {
       }
     } catch (error) {
       console.log(error);
+      seterror(true);
+      setInterval(() => {
+        setsuccess(false);
+      }, 1000);
+      setloading(false);
+      setsuccess(false);
+      setnoOfMint(0);
     }
   };
 
@@ -159,6 +173,19 @@ function App() {
           <Box sx={style}>
             <Typography sx={{ marginLeft: "20px" }} id="modal-modal-description">
               Please Connect to Goerli network
+            </Typography>
+          </Box>
+        </Modal>
+        <Modal
+          onClose={handleClose}
+          open={error}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <CancelIcon sx={{ color: "red" }} />
+            <Typography sx={{ marginLeft: "20px" }} id="modal-modal-description">
+              Oh an error occured while submiting your transaction.
             </Typography>
           </Box>
         </Modal>
