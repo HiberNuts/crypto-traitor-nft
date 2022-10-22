@@ -185,7 +185,7 @@ function App() {
           <Box sx={style}>
             <CancelIcon sx={{ color: "red" }} />
             <Typography sx={{ marginLeft: "20px" }} id="modal-modal-description">
-              Oh an error occured while submiting your transaction.
+              Oh! an error occured while submiting your transaction.
             </Typography>
           </Box>
         </Modal>
